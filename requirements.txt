@@ -1,0 +1,16 @@
+# Пайплайн
+faiss-cpu==1.15.0
+langchain-text-splitters==1.1.2
+numpy==2.4.4
+sentence-transformers==5.1.2
+openai==3.13.0
+python-dotenv==1.1.1
+
+# Интерфейсы
+fastapi==0.141.1
+uvicorn[standard]==0.38.0
+
+# Офлайн-режим и тесты
+scikit-learn==1.8.0
+pytest==8.4.2
+httpx==0.28.1
