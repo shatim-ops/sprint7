@@ -1,10 +1,10 @@
 {
   "documents": 45,
   "chunks": 101,
-  "backend": "tfidf",
+  "backend": "local",
   "model": "intfloat/multilingual-e5-small",
-  "dimension": 100,
+  "dimension": 384,
   "chunk_size": 700,
   "chunk_overlap": 120,
-  "build_seconds": 1.34
+  "build_seconds": 1.25
 }
