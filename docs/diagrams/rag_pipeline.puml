@@ -1,0 +1,40 @@
+@startuml rag_pipeline
+title RAG-бот: путь запроса
+
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign center
+
+actor "Сотрудник" as user
+participant "CLI / HTTP API" as api
+participant "RagBot" as bot
+participant "Эмбеддер\ne5-small" as emb
+database "FAISS\nиндекс" as faiss
+participant "Guard\nфильтр инъекций" as guard
+participant "LLM\nOpenAI-совместимый" as llm
+
+user -> api : вопрос
+api -> bot : answer(question)
+bot -> emb : encode_query
+emb --> bot : вектор 384
+bot -> faiss : поиск top_k
+faiss --> bot : чанки со score
+
+bot -> guard : filter_chunks
+guard --> bot : безопасные чанки + заблокированные
+
+alt нет чанков выше порога релевантности
+  bot --> api : "Я не знаю" (к модели не идём)
+else есть релевантные чанки
+  bot -> llm : system + few-shot + контекст + вопрос
+  llm --> bot : рассуждение, ответ, источники
+  bot -> guard : постпроверка ответа
+  alt ответ пересказывает заблокированный чанк или содержит учётные данные
+    guard --> bot : блокировать
+    bot --> api : отказ с пояснением
+  else ответ чистый
+    bot --> api : ответ + источники
+  end
+end
+api --> user : ответ
+
+@enduml

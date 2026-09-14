@@ -2,15 +2,16 @@
 faiss-cpu==1.15.0
 langchain-text-splitters==1.1.2
 numpy==2.4.4
-sentence-transformers==5.1.2
+sentence-transformers==6.0.1
 openai==3.13.0
-python-dotenv==1.1.1
+python-dotenv==1.2.2
 
 # Интерфейсы
 fastapi==0.141.1
-uvicorn[standard]==0.38.0
+uvicorn[standard]==0.46.0
 
-# Офлайн-режим и тесты
+# Офлайн-режим, тесты, оформление отчёта
 scikit-learn==1.8.0
-pytest==8.4.2
+pytest==9.1.1
+pillow==12.2.0
 httpx==0.28.1

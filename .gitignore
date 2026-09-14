@@ -7,3 +7,6 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
+
+# Артефакт офлайн-режима, пересобирается локально
+index/tfidf.pkl

@@ -10,7 +10,7 @@ index:
 	python scripts/build_index.py
 
 demo:
-	python scripts/demo.py
+	python scripts/demo.py && python scripts/render_screens.py
 
 cli:
 	python -m rag.cli
