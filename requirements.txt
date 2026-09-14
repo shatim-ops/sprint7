@@ -13,4 +13,5 @@ uvicorn[standard]==0.38.0
 # Офлайн-режим и тесты
 scikit-learn==1.8.0
 pytest==8.4.2
+pillow==11.3.0
 httpx==0.28.1
