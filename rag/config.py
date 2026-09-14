@@ -38,10 +38,10 @@ class Settings:
 
     # LLM: любой эндпоинт с совместимым OpenAI API (Cloud.ru, OpenAI, локальный vLLM)
     llm_base_url: str = field(default_factory=lambda: _env("LLM_BASE_URL", "https://foundation-models.api.cloud.ru/v1"))
-    llm_model: str = field(default_factory=lambda: _env("LLM_MODEL", "Qwen/Qwen2.5-32B-Instruct"))
+    llm_model: str = field(default_factory=lambda: _env("LLM_MODEL", "openai/gpt-oss-120b"))
     llm_api_key: str = field(default_factory=lambda: _env("LLM_API_KEY", ""))
     temperature: float = field(default_factory=lambda: float(_env("LLM_TEMPERATURE", "0.1")))
-    max_tokens: int = field(default_factory=lambda: int(_env("LLM_MAX_TOKENS", "700")))
+    max_tokens: int = field(default_factory=lambda: int(_env("LLM_MAX_TOKENS", "1500")))
 
     # Защита от инъекций в документах
     guard_enabled: bool = field(default_factory=lambda: _env("GUARD_ENABLED", "true").lower() == "true")

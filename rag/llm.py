@@ -37,9 +37,21 @@ class ChatModel:
             temperature=self.temperature,
             max_tokens=self.max_tokens,
         )
+        choice = response.choices[0]
+        text = (choice.message.content or "").strip()
+        if not text:
+            # Рассуждающие модели иногда кладут весь вывод в отдельное поле,
+            # а при обрыве по лимиту возвращают пустой content. Разбираем оба случая.
+            text = (getattr(choice.message, "reasoning_content", "") or "").strip()
+        if not text:
+            raise RuntimeError(
+                f"Модель {self.model} вернула пустой ответ, "
+                f"finish_reason={getattr(choice, 'finish_reason', 'неизвестен')}. "
+                "Чаще всего это упёршийся LLM_MAX_TOKENS."
+            )
         usage = getattr(response, "usage", None)
         return LlmReply(
-            text=response.choices[0].message.content.strip(),
+            text=text,
             model=self.model,
             prompt_tokens=getattr(usage, "prompt_tokens", 0) or 0,
             completion_tokens=getattr(usage, "completion_tokens", 0) or 0,
