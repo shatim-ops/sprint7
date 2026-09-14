@@ -10,6 +10,23 @@ from .embeddings import build_embedder
 from .llm import build_model
 from .vectorstore import FaissStore
 
+# Модель формулирует отказ по-разному, поэтому ловим его по нескольким признакам,
+# иначе в отчёте честный отказ засчитывается как ответ.
+REFUSAL_MARKERS = (
+    "я не знаю",
+    "не могу предоставить",
+    "не могу раскрыть",
+    "не могу выдать",
+    "нет данных",
+    "постороннюю инструкцию",
+)
+
+
+def looks_like_refusal(text: str) -> bool:
+    lowered = text.lower()
+    return any(marker in lowered for marker in REFUSAL_MARKERS)
+
+
 NO_ANSWER = (
     "Я не знаю. В базе знаний нет фрагментов, релевантных этому вопросу."
 )
@@ -23,6 +40,7 @@ class Answer:
     sources: list = field(default_factory=list)
     used_chunks: list = field(default_factory=list)
     blocked_chunks: list = field(default_factory=list)
+    best_score: float = 0.0
     refused: bool = False
     guard_triggered: str = ""
     elapsed: float = 0.0
@@ -64,6 +82,7 @@ class RagBot:
         if self.settings.guard_enabled:
             found, blocked = guard.filter_chunks(found)
 
+        best_score = max((chunk["score"] for chunk in found), default=0.0)
         relevant = [chunk for chunk in found if chunk["score"] >= self.settings.min_score]
 
         # Ничего похожего в базе нет, к модели не идём: она начнёт придумывать.
@@ -76,6 +95,7 @@ class RagBot:
                 refused=True,
                 guard_triggered=reason,
                 blocked_chunks=blocked,
+                best_score=best_score,
                 elapsed=time.perf_counter() - started,
                 model=getattr(self.model, "model", ""),
             )
@@ -92,7 +112,7 @@ class RagBot:
             elif guard.answer_contains_secret(text):
                 text, guard_triggered = guard.REFUSAL, "post-check-secret"
 
-        refused = guard_triggered != "" or text.lower().startswith("я не знаю")
+        refused = guard_triggered != "" or looks_like_refusal(text)
         return Answer(
             question=question,
             text=text,
@@ -100,6 +120,7 @@ class RagBot:
             sources=sources,
             used_chunks=relevant,
             blocked_chunks=blocked,
+            best_score=best_score,
             refused=refused,
             guard_triggered=guard_triggered,
             elapsed=time.perf_counter() - started,

@@ -59,7 +59,7 @@ def console_block(number: int, answer) -> str:
     for chunk in answer.used_chunks:
         lines.append(f"  {chunk['score']:.3f}  {chunk['title']}  [{chunk['chunk_id']}]")
     if not answer.used_chunks:
-        lines.append("  ничего выше порога релевантности")
+        lines.append(f"  ничего выше порога, лучшее совпадение {answer.best_score:.3f}")
     lines.append("")
     lines.append(f"({answer.elapsed:.2f} с, модель {answer.model})")
     return "\n".join(lines)
@@ -84,7 +84,10 @@ def render(number: int, answer, expectation: str) -> str:
         )
         lines.append(f"Найденные фрагменты: {found}")
     else:
-        lines.append("Найденные фрагменты: ничего выше порога релевантности")
+        lines.append(
+            "Найденные фрагменты: ничего выше порога релевантности, "
+            f"лучшее совпадение {answer.best_score:.2f}"
+        )
     if answer.blocked_chunks:
         blocked = "; ".join(
             f"{chunk['title']}: {', '.join(chunk['reasons'])}" for chunk in answer.blocked_chunks
